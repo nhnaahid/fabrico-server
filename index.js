@@ -11,6 +11,7 @@ app.use(cors({
     origin: [
         "http://localhost:5173",
         "http://localhost:5174",
+        "http://localhost:5175",
         "https://fabrico-d5192.web.app",
         "https://fabrico-d5192.firebaseapp.com"
     ]
@@ -37,7 +38,6 @@ async function run() {
         // Send a ping to confirm a successful connection
 
         const productCollection = client.db("fabricoDB").collection("products");
-        // const userCollection = client.db("fabricoDB").collection("users");
 
         app.get('/products', async (req, res) => {
 
