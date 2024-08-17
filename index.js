@@ -42,11 +42,11 @@ async function run() {
         app.get('/products', async (req, res) => {
 
             // Retrieve query parameters from req.query
-            const { category, brand, minPrice, maxPrice, search } = req.query;
+            const { category, brand, minPrice, maxPrice, search, sort } = req.query;
             const filter = {
                 search: search
             }
-            // console.log(filter);
+            console.log(sort);
             // Convert query strings back to arrays and integers
             const categoryArray = category ? category.split(',') : [];
             const brandArray = brand ? brand.split(',') : [];
@@ -65,6 +65,23 @@ async function run() {
             if (!isNaN(min) && !isNaN(max)) {
                 query.price = { $gte: min, $lte: max };
             }
+
+            let sortOption = {};
+
+            if (sort === 'lo2hi') {
+                sortOption = { price: 1 };
+            }
+            else if (sort === 'hi2lo') {
+                sortOption = { price: -1 };
+            }
+            if (sort === 'newest') {
+                sortOption = { date: -1 };
+            }
+
+            else if (sort === 'oldest') {
+                sortOption = { date: 1 };
+            }
+
             const searchQuery = {
                 name: { $regex: filter.search, $options: 'i' }
             };
@@ -75,9 +92,9 @@ async function run() {
                     searchQuery,
                 ]
             };
-            console.log('after: ', query);
+            // console.log('after: ', query);
 
-            const result = await productCollection.find(combinedQuery).toArray();
+            const result = await productCollection.find(combinedQuery).sort(sortOption).toArray();
             res.send(result);
         })
 
