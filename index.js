@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const port = process.env.PORT || 5000;
 
@@ -28,8 +29,39 @@ async function run() {
         // await client.connect();
         // Send a ping to confirm a successful connection
 
+        const productCollection = client.db("fabricoDB").collection("products");
+        const userCollection = client.db("fabricoDB").collection("users");
 
-        // TODO
+        app.get('/products', async (req, res) => {
+
+            // Retrieve query parameters from req.query
+            const { category, brand, minPrice, maxPrice } = req.query;
+
+            // Convert query strings back to arrays and integers
+            const categoryArray = category ? category.split(',') : [];
+            const brandArray = brand ? brand.split(',') : [];
+            const min = parseInt(minPrice, 10);
+            const max = parseInt(maxPrice, 10);
+
+            // Construct the query object
+            const query = {};
+
+            if (categoryArray.length > 0) {
+                query.category = { $in: categoryArray };
+            }
+            if (brandArray.length > 0) {
+                query.brand = { $in: brandArray };
+            }
+            if (!isNaN(min) && !isNaN(max)) {
+                query.price = { $gte: min, $lte: max };
+            }
+
+            console.log(query);
+
+            const result = await productCollection.find(query).toArray();
+            res.send(result);
+        })
+
 
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
