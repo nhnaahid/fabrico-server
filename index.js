@@ -46,14 +46,16 @@ async function run() {
             const filter = {
                 search: search
             }
-            console.log(currentPage);
-            console.log(productPerPage);
+            // console.log(currentPage);
+            // console.log(productPerPage);
 
             // Convert query strings back to arrays and integers
             const categoryArray = category ? category.split(',') : [];
             const brandArray = brand ? brand.split(',') : [];
             const min = parseInt(minPrice, 10);
             const max = parseInt(maxPrice, 10);
+            const page = parseInt(currentPage);
+            const size = parseInt(productPerPage);
 
             // Construct the query object
             const query = {};
@@ -96,8 +98,12 @@ async function run() {
             };
             // console.log('after: ', query);
 
-            const result = await productCollection.find(combinedQuery).sort(sortOption).toArray();
+            const result = await productCollection.find(combinedQuery).skip(page * size).limit(size).sort(sortOption).toArray();
             res.send(result);
+        })
+        app.get('/productCount', async (req, res) => {
+            const count = await productCollection.estimatedDocumentCount();
+            res.send({ count });
         })
 
 
