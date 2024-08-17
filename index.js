@@ -37,16 +37,18 @@ async function run() {
         // Send a ping to confirm a successful connection
 
         const productCollection = client.db("fabricoDB").collection("products");
-        const userCollection = client.db("fabricoDB").collection("users");
+        // const userCollection = client.db("fabricoDB").collection("users");
 
         app.get('/products', async (req, res) => {
 
             // Retrieve query parameters from req.query
-            const { category, brand, minPrice, maxPrice, search, sort } = req.query;
+            const { category, brand, minPrice, maxPrice, search, sort, currentPage, productPerPage } = req.query;
             const filter = {
                 search: search
             }
-            console.log(sort);
+            console.log(currentPage);
+            console.log(productPerPage);
+
             // Convert query strings back to arrays and integers
             const categoryArray = category ? category.split(',') : [];
             const brandArray = brand ? brand.split(',') : [];
