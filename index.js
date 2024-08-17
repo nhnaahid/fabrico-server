@@ -101,6 +101,7 @@ async function run() {
             const result = await productCollection.find(combinedQuery).skip(page * size).limit(size).sort(sortOption).toArray();
             res.send(result);
         })
+
         app.get('/productCount', async (req, res) => {
             const count = await productCollection.estimatedDocumentCount();
             res.send({ count });
