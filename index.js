@@ -42,8 +42,11 @@ async function run() {
         app.get('/products', async (req, res) => {
 
             // Retrieve query parameters from req.query
-            const { category, brand, minPrice, maxPrice } = req.query;
-
+            const { category, brand, minPrice, maxPrice, search } = req.query;
+            const filter = {
+                search: search
+            }
+            // console.log(filter);
             // Convert query strings back to arrays and integers
             const categoryArray = category ? category.split(',') : [];
             const brandArray = brand ? brand.split(',') : [];
@@ -62,10 +65,19 @@ async function run() {
             if (!isNaN(min) && !isNaN(max)) {
                 query.price = { $gte: min, $lte: max };
             }
+            const searchQuery = {
+                name: { $regex: filter.search, $options: 'i' }
+            };
 
-            console.log(query);
+            const combinedQuery = {
+                $and: [
+                    query,
+                    searchQuery,
+                ]
+            };
+            console.log('after: ', query);
 
-            const result = await productCollection.find(query).toArray();
+            const result = await productCollection.find(combinedQuery).toArray();
             res.send(result);
         })
 
